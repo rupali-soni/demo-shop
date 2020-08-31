@@ -5,7 +5,7 @@ namespace Demoshop\controllers;
 
 
 use Demoshop\controllers\v1\AuthControllerDIC;
-use Demoshop\controllers\v1\CheckoutControllerDIC;
+use Demoshop\controllers\v1\OrderControllerDIC;
 use Demoshop\controllers\v1\PaymentMethodControllerDIC;
 use Demoshop\controllers\v1\ShippingMethodControllerDIC;
 use Demoshop\models\ApiUserModelDIC;
@@ -32,7 +32,7 @@ class DependencyInjectionContainer {
         IndexControllerDIC,
         ShippingMethodControllerDIC,
         PaymentMethodControllerDIC,
-        CheckoutControllerDIC,
+        OrderControllerDIC,
         CartModelDIC,
         OrderModelDIC,
         ApiUserModelDIC,

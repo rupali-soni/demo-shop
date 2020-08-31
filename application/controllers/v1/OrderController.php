@@ -9,7 +9,7 @@ use Demoshop\service\ApiOutput;
 use Demoshop\service\Cart;
 use Demoshop\service\Orders;
 
-class CheckoutController extends BaseController {
+class OrderController extends BaseController {
 
     /**
      * @var Cart
@@ -22,7 +22,7 @@ class CheckoutController extends BaseController {
     private $oOrdersService;
 
     /**
-     * CheckoutController constructor.
+     * OrderController constructor.
      * @param ApiOutput $oApiOutputService
      * @param AuthController $oAuthController
      * @param Cart $oCartService

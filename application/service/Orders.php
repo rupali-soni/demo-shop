@@ -35,20 +35,44 @@ class Orders {
         $checkoutEntity = new Checkout();
         $checkoutEntity->cart = $oCartEntity;
         $shippingAddressEntity = new Address();
-        $shippingAddressEntity->companyName = $postData['shippingAddress']['companyName'];
+        $shippingAddressEntity->companyName = $postData['shippingCompanyName'];
+        $shippingAddressEntity->streetName = $postData['shippingStreetName'];
+        $shippingAddressEntity->houseNumber = $postData['shippingHouseNumber'];
+        $shippingAddressEntity->zipCode = $postData['shippingZipCode'];
+        $shippingAddressEntity->city = $postData['shippingCity'];
+        $shippingAddressEntity->state = $postData['shippingState'];
+        $shippingAddressEntity->country = $postData['shippingCountry'];
+        $shippingAddressEntity->mobileNumber = $postData['shippingMobile'];
         $checkoutEntity->shippingAddress = $shippingAddressEntity;
         $checkoutEntity->isSameAddress = intval( $postData['isSameBillingAddress'] );
         if ( 1 === $checkoutEntity->isSameAddress ) {
             $checkoutEntity->billingAddress = $shippingAddressEntity;
         } else {
-           $billingAddressEntity = new Address();
-           $billingAddressEntity->companyName = $postData['billingAddress']['companyName'];
+            $billingAddressEntity = new Address();
+            $billingAddressEntity->companyName = $postData['billingCompanyName'];
+            $billingAddressEntity->streetName = $postData['billingStreetName'];
+            $billingAddressEntity->houseNumber = $postData['billingHouseNumber'];
+            $billingAddressEntity->zipCode = $postData['billingZipCode'];
+            $billingAddressEntity->city = $postData['billingCity'];
+            $billingAddressEntity->state = $postData['billingState'];
+            $billingAddressEntity->country = $postData['billingCountry'];
+            $billingAddressEntity->mobileNumber = $postData['billingMobile'];
 
            $checkoutEntity->billingAddress = $billingAddressEntity;
         }
         $checkoutEntity->paymentType = $postData['paymentType'];
         $paymentInformation = new PaymentInformation();
-
+        switch ( $checkoutEntity->paymentType ) {
+            case 'Direct Debit':
+                $paymentInformation->iBan = $postData['iBan'];
+                $paymentInformation->BIC = $postData['BIC'];
+                $paymentInformation->bankName = $postData['bankName'];
+                break;
+            case 'Credit Card':
+                $paymentInformation->cardNumber = $postData['cardNumber'];
+                $paymentInformation->cvc = $postData['cvc'];
+                $paymentInformation->expiryDate = $postData['expiryDate'];
+        }
         $checkoutEntity->paymentInformation = $paymentInformation;
         $checkoutEntity->customerId = $postData['customerId'];
         $checkoutEntity->customerEmailAddress = $postData['customerEmailAddress'];

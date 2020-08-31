@@ -14,7 +14,6 @@ try {
     //calling router to dispatch request
     $router->dispatch();
 } catch (Exception $e) {
-    print_r($e);
     echo "404 page not found";
 }
 
