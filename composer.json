@@ -1,0 +1,38 @@
+{
+    "name": "com/demoshop",
+    "description": "This is an online shop.",
+    "authors": [
+        {
+            "name": "Online Shop",
+            "email": "rupali.soni19@gmail.com"
+        }
+    ],
+    "autoload": {
+      "classmap": ["application/"],
+      "psr-4":{
+        "Demoshop\\controllers\\": "./application/controllers",
+        "Demoshop\\config\\": "./application/config",
+        "Demoshop\\models\\": "./application/models",
+        "Demoshop\\entity\\": "./application/entity",
+        "Demoshop\\service\\": "./application/service"
+      }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Demoshop\\": "tests/"
+        }
+    },
+    "require": {
+        "php": "^7.0.5",
+        "firebase/php-jwt": "^5.2",
+        "zircote/swagger-php": "^3.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^5.5.0"
+    },
+    "minimum-stability": "stable",
+    "scripts": {
+        "test": "vendor/bin/phpunit",
+        "quicktest": "vendor/bin/phpunit --no-coverage"
+    }
+}
