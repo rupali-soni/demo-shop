@@ -32,46 +32,48 @@ class Orders {
      * @return Checkout
      */
     public function getCheckoutObject ( $postData, \Demoshop\entity\Cart $oCartEntity ) {
+        //@todo: we can also apply filters for post data here
         $checkoutEntity = new Checkout();
         $checkoutEntity->cart = $oCartEntity;
         $shippingAddressEntity = new Address();
-        $shippingAddressEntity->companyName = $postData['shippingCompanyName'];
-        $shippingAddressEntity->streetName = $postData['shippingStreetName'];
-        $shippingAddressEntity->houseNumber = $postData['shippingHouseNumber'];
-        $shippingAddressEntity->zipCode = $postData['shippingZipCode'];
-        $shippingAddressEntity->city = $postData['shippingCity'];
-        $shippingAddressEntity->state = $postData['shippingState'];
-        $shippingAddressEntity->country = $postData['shippingCountry'];
-        $shippingAddressEntity->mobileNumber = $postData['shippingMobile'];
+        $shippingAddressEntity->companyName = trim( $postData['shippingCompanyName'] );
+        $shippingAddressEntity->streetName = trim( $postData['shippingStreetName']);
+        $shippingAddressEntity->houseNumber = intval( $postData['shippingHouseNumber'] );
+        $shippingAddressEntity->zipCode = intval( $postData['shippingZipCode'] );
+        $shippingAddressEntity->city = trim( $postData['shippingCity']);
+        $shippingAddressEntity->state = trim( $postData['shippingState']);
+        $shippingAddressEntity->country = trim( $postData['shippingCountry']);
+        $shippingAddressEntity->mobileNumber = intval($postData['shippingMobile']);
         $checkoutEntity->shippingAddress = $shippingAddressEntity;
         $checkoutEntity->isSameAddress = intval( $postData['isSameBillingAddress'] );
         if ( 1 === $checkoutEntity->isSameAddress ) {
             $checkoutEntity->billingAddress = $shippingAddressEntity;
         } else {
             $billingAddressEntity = new Address();
-            $billingAddressEntity->companyName = $postData['billingCompanyName'];
-            $billingAddressEntity->streetName = $postData['billingStreetName'];
-            $billingAddressEntity->houseNumber = $postData['billingHouseNumber'];
-            $billingAddressEntity->zipCode = $postData['billingZipCode'];
-            $billingAddressEntity->city = $postData['billingCity'];
-            $billingAddressEntity->state = $postData['billingState'];
-            $billingAddressEntity->country = $postData['billingCountry'];
-            $billingAddressEntity->mobileNumber = $postData['billingMobile'];
+            $billingAddressEntity->companyName = trim( $postData['billingCompanyName'] );
+            $billingAddressEntity->streetName = trim( $postData['billingStreetName'] );
+            $billingAddressEntity->houseNumber = intval( $postData['billingHouseNumber'] );
+            $billingAddressEntity->zipCode = intval( $postData['billingZipCode']);
+            $billingAddressEntity->city = trim( $postData['billingCity'] );
+            $billingAddressEntity->state = trim( $postData['billingState'] );
+            $billingAddressEntity->country = trim( $postData['billingCountry'] );
+            $billingAddressEntity->mobileNumber = intval( $postData['billingMobile'] );
 
            $checkoutEntity->billingAddress = $billingAddressEntity;
         }
-        $checkoutEntity->paymentType = $postData['paymentType'];
+        $checkoutEntity->paymentType = trim( $postData['paymentType'] );
         $paymentInformation = new PaymentInformation();
         switch ( $checkoutEntity->paymentType ) {
             case 'Direct Debit':
                 $paymentInformation->iBan = $postData['iBan'];
                 $paymentInformation->BIC = $postData['BIC'];
-                $paymentInformation->bankName = $postData['bankName'];
+                $paymentInformation->bankName = trim( $postData['bankName'] );
                 break;
             case 'Credit Card':
                 $paymentInformation->cardNumber = $postData['cardNumber'];
                 $paymentInformation->cvc = $postData['cvc'];
                 $paymentInformation->expiryDate = $postData['expiryDate'];
+                break;
         }
         $checkoutEntity->paymentInformation = $paymentInformation;
         $checkoutEntity->customerId = $postData['customerId'];
@@ -81,10 +83,84 @@ class Orders {
 
     /**
      * @param Checkout $oCheckout
-     * @return bool
+     * @return array|bool
      */
     public function validateCheckoutObject ( Checkout $oCheckout ) {
-        return true;
+        //@todo: implement more efficient validations.
+        $errors = [];
+        if ( true === empty( $oCheckout->shippingAddress->streetName ) ) {
+            $errors[] = 'Street name for shipping address is mandatory.';
+        }
+        if ( true === empty( $oCheckout->shippingAddress->houseNumber ) ) {
+            $errors[] = 'House number for shipping address is mandatory.';
+        }
+        if ( 0 === $oCheckout->shippingAddress->zipCode  ) {
+            $errors[] = 'Zipcode for shipping address is mandatory.';
+        }
+        if ( true === empty( $oCheckout->shippingAddress->city ) ) {
+            $errors[] = 'City name for shipping address is mandatory.';
+        }
+        if ( true === empty( $oCheckout->shippingAddress->state ) ) {
+            $errors[] = 'State name for shipping address is mandatory.';
+        }
+        if ( true === empty( $oCheckout->shippingAddress->country ) ) {
+            $errors[] = 'Country name for shipping address is mandatory.';
+        }
+
+        if ( 0 === $oCheckout->isSameAddress ) {
+            if ( true === empty( $oCheckout->billingAddress->streetName ) ) {
+                $errors[] = 'Street name for billing address is mandatory.';
+            }
+            if ( true === empty( $oCheckout->billingAddress->houseNumber ) ) {
+                $errors[] = 'House number for billing address is mandatory.';
+            }
+            if ( 0 === $oCheckout->billingAddress->zipCode  ) {
+                $errors[] = 'Zipcode for billing address is mandatory.';
+            }
+            if ( true === empty( $oCheckout->billingAddress->city ) ) {
+                $errors[] = 'City name for billing address is mandatory.';
+            }
+            if ( true === empty( $oCheckout->billingAddress->state ) ) {
+                $errors[] = 'State name for billing address is mandatory.';
+            }
+            if ( true === empty( $oCheckout->billingAddress->country ) ) {
+                $errors[] = 'Country name for billing address is mandatory.';
+            }
+        }
+
+        switch ( $oCheckout->paymentType ) {
+            case 'Direct Debit':
+                if ( true === empty( $oCheckout->paymentInformation->iBan ) ) {
+                    $errors[] = 'IBAN is mandatory.';
+                }
+                if ( true === empty( $oCheckout->paymentInformation->BIC ) ) {
+                    $errors[] = 'BIC is mandatory.';
+                }
+                if ( true === empty( $oCheckout->paymentInformation->bankName ) ) {
+                    $errors[] = 'bankName is mandatory.';
+                }
+                break;
+            case 'Credit Card':
+                if ( true === empty( $oCheckout->paymentInformation->cardNumber ) ) {
+                    $errors[] = 'Card number is mandatory.';
+                }
+                if ( true === empty( $oCheckout->paymentInformation->cvc ) ) {
+                    $errors[] = 'CVC is mandatory.';
+                }
+                if ( true === empty( $oCheckout->paymentInformation->expiryDate ) ) {
+                    $errors[] = 'Expiry Date is mandatory.';
+                }
+                break;
+        }
+        if ( true === empty( $oCheckout->customerEmailAddress ) ) {
+            $errors[] = 'Customer email address is mandatory.';
+        }
+
+        If ( 0 < count ( $errors ) ) {
+            return $errors;
+        } else {
+            return true;
+        }
     }
 
     /**
@@ -155,7 +231,7 @@ class Orders {
                     $data['fields'] = 'order_id, customer_id, product_id, quantity, price';
                     $data['values'] = ':order_id, :customer_id, :product_id, :quantity, :price';
                     $data['bindParam'] = $bData;
-                    $id = $this->_orderModel->insert($data);
+                    $id = $this->orderModel->insert($data);
                     //@todo: remove product from checkout table
                 }
                 $this->orderModel->commitTransaction();
